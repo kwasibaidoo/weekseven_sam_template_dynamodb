@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Todo Application DynamoDB Table
+
+Resources:
+  TodoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: task
+      BillingMode: PAY_PER_REQUEST  # On-demand capacity
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: StatusIndex
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      Tags:
+        - Key: Application
+          Value: TodoApp
+
+Outputs:
+  TodoTableName:
+    Description: Name of the DynamoDB table
+    Value: !Ref TodoTable
+    Export:
+      Name: TodoTable-Name
+  
+  TodoTableArn:
+    Description: ARN of the DynamoDB table
+    Value: !GetAtt TodoTable.Arn
+    Export:
+      Name: TodoTable-Arn
