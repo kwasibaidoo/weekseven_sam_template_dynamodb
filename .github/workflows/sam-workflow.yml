@@ -1,0 +1,35 @@
+name: Todo App CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Deploy DynamoDB using SAM if not already deployed
+  deploy-dynamodb:
+    name: Deploy DynamoDB with SAM
+    runs-on: ubuntu-latest
+    # Only run this job if it's the first deployment or explicitly triggered
+    if: github.event_name == 'workflow_dispatch' || github.run_number == 1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Setup SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build SAM application
+        run: sam build -t template.yaml
+
+      - name: Deploy SAM application
+        run: sam deploy --stack-name todo-app-dynamodb --no-confirm-changeset --no-fail-on-empty-changeset
