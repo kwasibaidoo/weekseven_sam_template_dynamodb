@@ -12,7 +12,7 @@ jobs:
     name: Deploy DynamoDB with SAM
     runs-on: ubuntu-latest
     # Only run this job if it's the first deployment or explicitly triggered
-    if: github.event_name == 'workflow_dispatch' || github.run_number == 1
+    # if: github.event_name == 'workflow_dispatch' || github.run_number == 1
 
     steps:
       - name: Checkout code
